@@ -1,11 +1,13 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useLayoutEffect, useState, useEffect } from 'react'
 import { Button, Icon, Input } from 'react-native-elements'
 import * as Contacts from 'expo-contacts';
 import { db } from '../firebase';
+import CustomListItem from '../compoments/CustomListItem';
 
 const AddChatScreen = ({navigation}) => {
     const [input, setInput] = useState("");
+    const [contacts, setContacts] = useState([]);
     const dataJSON = require('../assets/CountryCodes.json');
     var contactPhones = [];
     var countrCodes = [];
@@ -32,6 +34,25 @@ const AddChatScreen = ({navigation}) => {
               }
               for(var i = 0; i<contactPhones.length; i++){
                   mergedPhone[i] = countrCodes[i]+contactPhones[i];
+                  db.collection("users").where("phoneNumber", "==", mergedPhone[i])
+                  .get()
+                  .then(querySnapshot => {  
+                    if(querySnapshot.empty){
+                      console.log("No match");
+                      return;
+                    }else{
+                      const deneme = querySnapshot.docs;
+                      deneme.forEach((doc) => {
+                        setContacts(...contacts, querySnapshot.docs.map(doc => ({
+                          id: doc.id,
+                          data: doc.data(),
+                        })));
+                      });
+                    }                    
+                  })
+                  .catch(function(error) {
+                      console.log("Error getting documents: ", error);
+                  });
               }
             }
           }
@@ -51,12 +72,15 @@ const AddChatScreen = ({navigation}) => {
         }).catch((error) => alert(error));
     };
     return (
-    <View style={styles.container} >
-        <Input placeholder='Enter a chat name' onSubmitEditing={createChat} onChangeText={(text) => setInput(text)} value={input} leftIcon={
-            <Icon name='wechat' type='antdesign' size={24} color="black" />
-        } />
-        <Button onPress={createChat} title="Create new chat"/>
-    </View>
+      <SafeAreaView>
+      <ScrollView style={styles.container}>
+        {console.log(contacts)}
+        {contacts.map(({id, data: {displayName}})=>(
+          <CustomListItem key={id} id={id} chatName={displayName} enterChat={createChat} />
+        ))}
+      </ScrollView>
+    </SafeAreaView>
+    
   ) 
 }
 
