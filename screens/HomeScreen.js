@@ -1,10 +1,11 @@
-import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View, KeyboardAvoidingView } from 'react-native'
 import React, { useEffect, useLayoutEffect, useState } from 'react'
 import { StatusBar } from 'expo-status-bar'
 import CustomListItem from '../compoments/CustomListItem'
-import { Avatar } from 'react-native-elements'
+import { Avatar, Image, Button, Icon } from 'react-native-elements'
 import { auth, db } from '../firebase';
 import {AntDesign, SimpleLineIcons} from "@expo/vector-icons";
+import AddChatScreen from './AddChatScreen'
 
 const HomeScreen = ({navigation}) => {
   const [chats, setChats] = useState([]);
@@ -15,12 +16,12 @@ const HomeScreen = ({navigation}) => {
     });
   };
   useEffect(() => {
-    const unsubscribe = db.collection("chats").onSnapshot(snapshot => (
+    const unsubscribe = db.collection("chats").where("whoIs", "array-contains-any", [auth.currentUser.phoneNumber]).onSnapshot(snapshot => {
       setChats(snapshot.docs.map(doc => ({
         id: doc.id,
         data: doc.data(),
       })))
-    ));
+    });
     return unsubscribe;
   }, []);
   useEffect(() => {
@@ -66,13 +67,27 @@ const HomeScreen = ({navigation}) => {
       chatName,
     });
   };
+  const navigateToAdd = () => {
+    navigation.navigate("AddChat");
+  }
   return (
     <SafeAreaView>
+      {chats.length>0 ?
+      (
       <ScrollView style={styles.container}>
-        {chats.map(({id, data: {chatName}})=>(
-          <CustomListItem key={id} id={id} chatName={chatName} enterChat={enterChat} />
+        {chats.map(({id, data: {chatName1,chatName2,whoIs}})=>(
+          <CustomListItem key={id} id={id} chatName={whoIs[0]==auth.currentUser.phoneNumber?chatName2:chatName1} enterChat={enterChat} />
         ))}
       </ScrollView>
+      ):(
+        <View style={styles.noChat}>
+        <Image style={styles.noChat} source={{
+            uri: "https://www.shareicon.net/download/2015/09/07/97135_face_512x512.png",
+        }} style={{width: 150, height: 150}} />
+        <Text> There is no chat started!</Text>
+        </View>
+      )
+      }
     </SafeAreaView>
   )
 }
@@ -82,5 +97,9 @@ export default HomeScreen
 const styles = StyleSheet.create({
   container: {
     height: "100%"
+  },
+  noChat: {
+    alignItems: "center",
+    justifyContent: "center",
   },
 })
