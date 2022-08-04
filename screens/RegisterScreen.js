@@ -1,5 +1,5 @@
- import { KeyboardAvoidingView, StyleSheet, TouchableOpacity, View } from 'react-native'
- import React, { useLayoutEffect, useState } from 'react'
+ import { KeyboardAvoidingView, StyleSheet, TouchableOpacity, View, ActivityIndicator } from 'react-native'
+ import React, { useEffect, useLayoutEffect, useState } from 'react'
 import { StatusBar } from 'expo-status-bar'
 import { Avatar, Accessory, Button, Input, Text} from 'react-native-elements'
 import {AntDesign, SimpleLineIcons} from "@expo/vector-icons";
@@ -8,10 +8,12 @@ import { auth,db } from '../firebase';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { async } from '@firebase/util';
 import uuid from "uuid";
+import Spinner from 'react-native-loading-spinner-overlay';
  
  const RegisterScreen = ({ route: { params: { phoneNumber } }, navigation }) => {
    const [name, setName] = useState("");
    const [imageUrl, setImageUrl] = useState("https://www.seekpng.com/png/detail/110-1100707_person-avatar-placeholder.png");
+   const [isLoading, setIsLoading] = useState(false);
    
    useLayoutEffect(() => {
      navigation.setOptions({
@@ -41,8 +43,12 @@ import uuid from "uuid";
       quality: 1,
     });
     if (!pickerResult.cancelled) {
+      //FIXME: use effect çalışmıyor usestate anlık güncellemiyor!
+      setIsLoading(true);
       const uploadUrl = await uploadImageAsync(pickerResult.uri);
       setImageUrl(uploadUrl);
+      setIsLoading(false);
+      console.log(uploadUrl)
     }
   }
 
@@ -90,7 +96,14 @@ import uuid from "uuid";
   }
 
    return (
-     <KeyboardAvoidingView behavior='padding' style={styles.contaner}>
+     <>
+     {isLoading ? (
+        <View style={{flexDirection: 'row',justifyContent: 'space-around',padding: 10,flex: 1,}} >
+          <ActivityIndicator size="large" />
+        </View>
+     ):
+     (
+      <KeyboardAvoidingView behavior='padding' style={styles.contaner}>
        <StatusBar style='light' />
        <Text h3 style={{marginBottom: 50,}}>Create a Signal Account</Text>
        <View style={styles.inputContainer }> 
@@ -99,11 +112,14 @@ import uuid from "uuid";
                 <Avatar.Accessory size={24}/>
               </Avatar>
             </TouchableOpacity>
-            <Input placeholder='Full Name' autoFocus type="text" onChangeText={(text)=>{setName(text)}} value={(name)} />            
+            <Input placeholder='Full Name' style={{textAlign:'center'}} autoFocus type="text" onChangeText={(text)=>{setName(text)}} value={(name)} />            
        </View>
        <Button style={styles.button} raised onPress={register} title="Finish" />
        <View style={{height:100}} />
      </KeyboardAvoidingView>
+     )
+    }
+     </>
    )
  }
  
