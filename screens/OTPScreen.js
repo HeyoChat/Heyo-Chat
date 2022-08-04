@@ -7,6 +7,7 @@ import CustomTextInput from '../compoments/CustomTextInput';
 import FullButtonComponent from '../compoments/FullButtonCompoment';
 import { getAuth, PhoneAuthProvider, signInWithCredential } from 'firebase/auth';
 import { initializeApp, getApp } from 'firebase/app';
+import { auth,db } from '../firebase';
 
 
 const OTPScreen = function ({ route: { params: { phoneNumber } }, navigation }) {
@@ -17,7 +18,6 @@ const OTPScreen = function ({ route: { params: { phoneNumber } }, navigation }) 
   const [verificationId, setVerificationId] = React.useState();
   const recaptchaVerifier = React.useRef(null);
   const app = getApp();
-  const auth = getAuth();
   const firebaseConfig = app ? app.options : undefined;
   const attemptInvisibleVerification = true;
 
@@ -47,6 +47,7 @@ const OTPScreen = function ({ route: { params: { phoneNumber } }, navigation }) 
         setErrorMessage('Verification code has been sent to your phone.');
      }catch(e){
       alert(e);
+      navigation.goBack();
     }
    }
  
@@ -61,11 +62,29 @@ const OTPScreen = function ({ route: { params: { phoneNumber } }, navigation }) 
             );
      const response = await signInWithCredential(auth, credential);
      if(response){
-       navigation.replace("Register", {phoneNumber});
+      db.collection("users").where("phoneNumber", "==", phoneNumber)
+      .get()
+      .then(querySnapshot => {  
+        if(querySnapshot.empty){
+          navigation.replace("Register", {phoneNumber});
+        }else{
+          updateLogin(querySnapshot);
+        } 
+      })
      }
      } catch(e){
        alert(e);
      }
+   }
+   const updateLogin = (querySnapshot) => {
+    const data = querySnapshot.docs.map((doc) => doc.data());
+    const userNow = auth.currentUser;
+    userNow.updateProfile({
+      phoneNumber: phoneNumber, 
+      displayName: data[0].displayName,
+      photoURL: data[0].photoURL
+    });
+    navigation.navigate("Home");
    }
   const onOtpChange = index => {
     return value => {
