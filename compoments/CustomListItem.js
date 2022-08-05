@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { ListItemContent } from '@rneui/base/dist/ListItem/ListItem.Content'
 import { db } from '../firebase'
 
-const CustomListItem = ({id,chatName,enterChat}) => {
+const CustomListItem = ({id,chatName,phoneNumber,enterChat}) => {
     const [chatMessages, setChatMessages] = useState([]);
     useEffect(() => {
         const unsubscribe = db
@@ -16,7 +16,7 @@ const CustomListItem = ({id,chatName,enterChat}) => {
         return unsubscribe;
     });
   return (
-    <ListItem onPress={() => enterChat(id,chatName)} key={id} bottomDivider>
+    <ListItem onPress={() => enterChat(id,chatName,phoneNumber)} key={id} bottomDivider>
         <Avatar rounded source={{uri: chatMessages?.[0]?.photoURL || "https://www.seekpng.com/png/detail/110-1100707_person-avatar-placeholder.png"}} />
         <ListItem.Content>
             <ListItem.Title style={{fontWeight: "800"}}>
