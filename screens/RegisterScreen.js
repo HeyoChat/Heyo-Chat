@@ -105,7 +105,7 @@ import Spinner from 'react-native-loading-spinner-overlay';
      (
       <KeyboardAvoidingView behavior='padding' style={styles.contaner}>
        <StatusBar style='light' />
-       <Text h3 style={{marginBottom: 50,}}>Create a Signal Account</Text>
+       <Text h3 style={{marginBottom: 50,}}>Create a Hey-O Account</Text>
        <View style={styles.inputContainer }> 
              <TouchableOpacity onPress={openImagePickerAsync}>
               <Avatar size="xlarge" rounded source={{uri: imageUrl}}>

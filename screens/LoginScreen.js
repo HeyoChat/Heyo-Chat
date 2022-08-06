@@ -26,9 +26,7 @@ const LoginScreen = ({navigation}) => {
   return (
     <KeyboardAvoidingView behavior='padding' enabled style={styles.container}>
         <StatusBar style='light' />
-        <Image source={{
-            uri: "https://seeklogo.com/images/S/signal-logo-20A1616F60-seeklogo.com.png",
-        }} style={{width: 150, height: 150}} />
+        <Image source={require("../assets/login-icon.png")} style={{width: 150, height: 150}} />
         <View style={styles.inputContainer}>
             <PhoneInput
                 style={styles.phoneInput} 
