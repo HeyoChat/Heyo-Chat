@@ -22,7 +22,7 @@ const AddChatScreen = ({navigation}) => {
             });
     
             if (data.length > 0) {
-              
+              setIsLoading(true);
               for(var i = 0; i<data.length; i++){
                 contactPhones[i] = data[i]["phoneNumbers"][0]["digits"];
                 var code = data[i]["phoneNumbers"][0]["countryCode"].toUpperCase();
@@ -39,21 +39,22 @@ const AddChatScreen = ({navigation}) => {
                   .get()
                   .then(querySnapshot => {  
                     if(querySnapshot.empty){
-                      return;
                     }else{
-                      const deneme = querySnapshot.docs;
-                      deneme.forEach((doc) => {
-                        setContacts(...contacts, querySnapshot.docs.map(doc => ({
-                          id: doc.id,
-                          data: doc.data(),
-                        })));
-                      });
+                      const result = querySnapshot.docs.map(doc => ({
+                        id: doc.id,
+                        data: doc.data(),
+                      }));
+                      if (result[0].data.phoneNumber != auth.currentUser.phoneNumber){
+                          setContacts(old => [...old, result[0]]);
+                      }
                     }                    
                   })
                   .catch(function(error) {
                       console.log("Error getting documents: ", error);
                   });
+                  
               }
+              setIsLoading(false);
             }
           }
         })();
@@ -65,8 +66,27 @@ const AddChatScreen = ({navigation}) => {
         })
     }, [navigation]);  
     const createChat = async (id,displayName,phoneNumber) => {
-        var chatName2 = "";
-        const who = [auth.currentUser.phoneNumber,phoneNumber]
+      var chatName2 = "";
+      var isHave = false;
+      const who = [auth.currentUser.phoneNumber,phoneNumber]
+      await db.collection("chats").where("whoIs", "array-contains", phoneNumber)
+      .get()
+      .then(querySnapshot => {
+        if(!querySnapshot.empty){
+          isHave = true;
+          const chatData = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            data: doc.data(),
+          }));
+          const id = chatData[0].id;
+          const chatName = chatData[0].data.whoIs[0] == auth.currentUser.phoneNumber ? chatData[0].data.chatName2 : chatData[0].data.chatName1;  
+          navigation.navigate("Chat", {
+            id,
+            chatName,
+          });  
+        }
+      });
+      if(!isHave){
         await db.collection("users").where("phoneNumber", "==", phoneNumber)
         .get()
         .then(querySnapshot => {
@@ -80,10 +100,18 @@ const AddChatScreen = ({navigation}) => {
         }).then(() => {
             navigation.goBack();
         }).catch((error) => alert(error));
+      }
     };
     return (
       <SafeAreaView>
-      {contacts.length>0 ?
+      {
+          isLoading ?
+          (
+            <View style={{flexDirection: 'row',justifyContent: 'space-around',padding: 10,flex: 1,}} >
+              <ActivityIndicator size="large" />
+            </View>
+          )
+          : contacts.length>0 ?
           (
             <ScrollView style={styles.container}>
               {contacts.map(({id, data: {displayName,phoneNumber}})=>(
@@ -98,6 +126,7 @@ const AddChatScreen = ({navigation}) => {
                   uri: "https://www.shareicon.net/download/2015/09/07/97135_face_512x512.png",
               }} style={{width: 150, height: 150}} />
               <Text>There is no one registered in your contacts!</Text>
+              <ActivityIndicator style={{marginTop: 50,}} size="large" />
             </View>
           )
         }      
@@ -110,7 +139,6 @@ export default AddChatScreen
 const styles = StyleSheet.create({
     container: {
         backgroundColor: "white",
-        padding: 30,
         height: "100%",
     },
     noChat: {
