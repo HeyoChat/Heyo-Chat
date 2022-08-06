@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "ChatApp-2",
-    "slug": "ChatApp-2",
-    "version": "1.0.0",
+    "name": "Heyo",
+    "slug": "Heyo",
+    "version": "0.0.1b",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -24,7 +24,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.uemrey0.Heyo"
     },
     "web": {
       "favicon": "./assets/favicon.png"
