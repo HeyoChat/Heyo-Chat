@@ -5,6 +5,7 @@ import { Avatar } from 'react-native-elements';
 import {AntDesign, Ionicons, FontAwesome} from "@expo/vector-icons";
 import { auth, db } from '../firebase';
 import firebase from "firebase/compat/app";
+import Moment from 'moment';
 
 const ChatScreen = ({navigation, route}) => {
     const [input, setInput] = useState("");
@@ -21,7 +22,7 @@ const ChatScreen = ({navigation, route}) => {
                 </View>
             ),
             headerLeft: () => (
-                <TouchableOpacity style={{flexDirection: "row", alignItems: "center",}} onPress={() => navigation.goBack()}>
+                <TouchableOpacity style={{flexDirection: "row", alignItems: "center",}} onPress={() => navigation.navigate("Home")}>
                     <AntDesign style={{marginRight: 10}} name='arrowleft' size={25} color="white" />
                     <Avatar rounded source={{uri: messages[0]?.data.photoURL}} />
                 </TouchableOpacity>
@@ -90,6 +91,7 @@ const ChatScreen = ({navigation, route}) => {
                                     }}
                                     />
                                     <Text style={styles.recieverText}>{data.message}</Text>
+                                    <Text style={styles.senderName}>{Moment(data.timestamp.toDate()).format('H:m')}</Text>
                                 </View>
                             ) : (
                                 <View key={id} style={styles.sender}>
@@ -109,7 +111,7 @@ const ChatScreen = ({navigation, route}) => {
                                     }}
                                     />
                                     <Text style={styles.senderText}>{data.message}</Text>
-                                    <Text style={styles.senderName}>{data.displayName}</Text>
+                                    <Text style={styles.senderName}>{Moment(data.timestamp.toDate()).format('H:m')}</Text>
                                 </View>
                             )
                         ))}
@@ -176,7 +178,7 @@ const styles = StyleSheet.create({
         position: "relative",
     },
     senderText: {
-        color: "white",
+        color: "black",
         fontWeight: "500",
         marginLeft: 10,
         marginBottom: 15,
