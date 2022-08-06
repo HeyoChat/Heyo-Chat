@@ -34,7 +34,7 @@ const HomeScreen = ({navigation}) => {
   }, [])
   useLayoutEffect(() => {
     navigation.setOptions({
-        title: "Signal",
+        title: "Hey-O",
         headerStyle: {backgroundColor: "#fff"},
         headerTitleStyle: {color: "black"},
         headerTintColor: "black",
@@ -76,7 +76,7 @@ const HomeScreen = ({navigation}) => {
       (
       <ScrollView style={styles.container}>
         {chats.map(({id, data: {chatName1,chatName2,whoIs}})=>(
-          <CustomListItem key={id} id={id} chatName={whoIs[0]==auth.currentUser.phoneNumber?chatName2:chatName1} enterChat={enterChat} />
+          <CustomListItem key={id} id={id} chatName={whoIs[0]==auth.currentUser.phoneNumber?chatName2:chatName1} phoneNumber={whoIs[0]==auth.currentUser.phoneNumber?whoIs[1]:whoIs[0]} enterChat={enterChat} />
         ))}
       </ScrollView>
       ):(
