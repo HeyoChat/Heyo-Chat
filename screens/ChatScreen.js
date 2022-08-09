@@ -1,4 +1,4 @@
-import { Keyboard, KeyboardAvoidingView, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
+import { Keyboard, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 import React, { useLayoutEffect, useState } from 'react'
 import { StatusBar } from 'expo-status-bar';
 import { Avatar } from 'react-native-elements';
@@ -14,6 +14,7 @@ const ChatScreen = ({navigation, route}) => {
         navigation.setOptions({
             title: "Chat",
             headerBackTitleVisible: false,
+            headerBackVisible:false,
             headerTitleAlign: 'left',
             headerTitle: () => (
                 <View style={{flexDirection: "row", alignItems: "center",}}>
@@ -91,7 +92,7 @@ const ChatScreen = ({navigation, route}) => {
                                     }}
                                     />
                                     <Text style={styles.recieverText}>{data.message}</Text>
-                                    <Text style={styles.senderName}>{Moment(data.timestamp.toDate()).format('H:m')}</Text>
+                                    <Text style={styles.senderName}>{Moment(data.timestamp?.toDate()).format('H:m')}</Text>
                                 </View>
                             ) : (
                                 <View key={id} style={styles.sender}>
@@ -111,7 +112,7 @@ const ChatScreen = ({navigation, route}) => {
                                     }}
                                     />
                                     <Text style={styles.senderText}>{data.message}</Text>
-                                    <Text style={styles.senderName}>{Moment(data.timestamp.toDate()).format('H:m')}</Text>
+                                    <Text style={styles.senderName}>{Moment(data.timestamp?.toDate()).format('H:m')}</Text>
                                 </View>
                             )
                         ))}
