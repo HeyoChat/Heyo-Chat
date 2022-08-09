@@ -1,4 +1,4 @@
-import { SafeAreaView, ScrollView, StyleSheet, Text, View, ActivityIndicator } from 'react-native'
+import { SafeAreaView, ScrollView, StyleSheet, Text, View, ActivityIndicator, Platform } from 'react-native'
 import React, { useLayoutEffect, useState, useEffect } from 'react'
 import { Button, Icon, Input, Image } from 'react-native-elements'
 import * as Contacts from 'expo-contacts';
@@ -9,7 +9,6 @@ const AddChatScreen = ({navigation}) => {
     const [input, setInput] = useState("");
     const [contacts, setContacts] = useState([]);
     const dataJSON = require('../assets/CountryCodes.json');
-    const [isLoading, setIsLoading] = useState(false);
     var contactPhones = [];
     var countrCodes = [];
     var mergedPhone = [];
@@ -22,19 +21,33 @@ const AddChatScreen = ({navigation}) => {
             });
     
             if (data.length > 0) {
-              setIsLoading(true);
               for(var i = 0; i<data.length; i++){
-                contactPhones[i] = data[i]["phoneNumbers"][0]["digits"];
-                var code = data[i]["phoneNumbers"][0]["countryCode"].toUpperCase();
-                for (var j = 0; j<dataJSON.length; j++){
+                if (Platform.OS == "ios"){
+                  contactPhones[i] = data[i]["phoneNumbers"][0]["digits"];
+                  var code = data[i]["phoneNumbers"][0]["countryCode"].toUpperCase();
+                  for (var j = 0; j<dataJSON.length; j++){
                     if(dataJSON[j].code === code){
-                        countrCodes[i] = dataJSON[j].dial_code;
+                        !contactPhones[i].startsWith("+") ?
+                        countrCodes[i] = dataJSON[j].dial_code :
+                        countrCodes[i] = "";
                     }
+                  }
+                }else if(Platform.OS == "android"){
+                  const number = data[i].phoneNumbers && data[i].phoneNumbers[1] && data[i].phoneNumbers[1].number && data[i].phoneNumbers[0] && data[i].phoneNumbersgit[0].number
+                  
+                  number != undefined ? mergedPhone[i] = number : mergedPhone[i] = "";
+                  mergedPhone[i] = mergedPhone[i].replace(/ /g, '');
+                  if(mergedPhone[i].startsWith("0")){
+                    mergedPhone[i] = "+9"+mergedPhone[i]
+                  }
+                  console.log(mergedPhone[i])
                 }
                 
               }
-              for(var i = 0; i<contactPhones.length; i++){
-                  mergedPhone[i] = countrCodes[i]+contactPhones[i];
+              for(var i = 0; Platform.OS == "ios" ? i<contactPhones.length : i<mergedPhone.length; i++){
+                  if(Platform.OS == "ios"){
+                    mergedPhone[i] = countrCodes[i]+contactPhones[i];
+                  }
                   db.collection("users").where("phoneNumber", "==", mergedPhone[i])
                   .get()
                   .then(querySnapshot => {  
@@ -54,7 +67,6 @@ const AddChatScreen = ({navigation}) => {
                   });
                   
               }
-              setIsLoading(false);
             }
           }
         })();
@@ -105,13 +117,7 @@ const AddChatScreen = ({navigation}) => {
     return (
       <SafeAreaView>
       {
-          isLoading ?
-          (
-            <View style={{flexDirection: 'row',justifyContent: 'space-around',padding: 10,flex: 1,}} >
-              <ActivityIndicator size="large" />
-            </View>
-          )
-          : contacts.length>0 ?
+          contacts.length>0 ?
           (
             <ScrollView style={styles.container}>
               {contacts.map(({id, data: {displayName,phoneNumber}})=>(
