@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View, ActivityIndicator } from 'react-native'
 import React, { useEffect, useLayoutEffect } from 'react'
 import { auth } from '../firebase'
 
@@ -19,18 +19,10 @@ const LoadingScreen = ({navigation}) => {
     return unsubscribe;
   }, [])
   return (
-    <View style={styles.container}>
-      <Text>LoadingScreen</Text>
+    <View style={{flexDirection: 'row',justifyContent: 'space-around',padding: 10,flex: 1,}} >
+      <ActivityIndicator size="large" />
     </View>
   )
 }
 
 export default LoadingScreen
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-})
