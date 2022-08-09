@@ -35,6 +35,7 @@ const HomeScreen = ({navigation}) => {
   useLayoutEffect(() => {
     navigation.setOptions({
         title: "Hey-O",
+        headerTitleAlign: 'center',
         headerStyle: {backgroundColor: "#fff"},
         headerTitleStyle: {color: "black"},
         headerTintColor: "black",
