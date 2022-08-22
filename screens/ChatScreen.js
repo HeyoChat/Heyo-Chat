@@ -1,5 +1,5 @@
 import { Keyboard, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
-import React, { useLayoutEffect, useState } from 'react'
+import React, { useLayoutEffect, useState, useEffect } from 'react'
 import { StatusBar } from 'expo-status-bar';
 import { Avatar } from 'react-native-elements';
 import {AntDesign, Ionicons, FontAwesome} from "@expo/vector-icons";
@@ -10,6 +10,7 @@ import Moment from 'moment';
 const ChatScreen = ({navigation, route}) => {
     const [input, setInput] = useState("");
     const [messages, setMessages] = useState([]);
+    const [photoURL, setPhotoURL] = useState([]);
     useLayoutEffect(() => {
         navigation.setOptions({
             title: "Chat",
@@ -25,7 +26,7 @@ const ChatScreen = ({navigation, route}) => {
             headerLeft: () => (
                 <TouchableOpacity style={{flexDirection: "row", alignItems: "center",}} onPress={() => navigation.navigate("Home")}>
                     <AntDesign style={{marginRight: 10}} name='arrowleft' size={25} color="white" />
-                    <Avatar rounded source={{uri: messages[0]?.data.photoURL}} />
+                    <Avatar rounded source={{uri: photoURL[0]}} />
                 </TouchableOpacity>
             ),
             headerRight: () => (
@@ -50,6 +51,15 @@ const ChatScreen = ({navigation, route}) => {
         });
         setInput("");
     };
+    useEffect(() => {
+        const unsubscribe = db
+        .collection("users")
+        .where("phoneNumber", "==", route.params.phoneNumber)
+        .onSnapshot((snapshot) => {
+            setPhotoURL(snapshot.docs.map((doc) => doc.data().photoURL))
+        });
+        return unsubscribe;
+    });
     useLayoutEffect(() => {
         const unsubscribe = db
         .collection("chats")

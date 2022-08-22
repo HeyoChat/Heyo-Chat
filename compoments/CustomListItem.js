@@ -6,6 +6,7 @@ import { db } from '../firebase'
 
 const CustomListItem = ({id,chatName,phoneNumber,enterChat}) => {
     const [chatMessages, setChatMessages] = useState([]);
+    const [photoURL, setPhotoURL] = useState([]);
     useEffect(() => {
         const unsubscribe = db
         .collection("chats")
@@ -15,9 +16,18 @@ const CustomListItem = ({id,chatName,phoneNumber,enterChat}) => {
         .onSnapshot((snapshot) => setChatMessages(snapshot.docs.map((doc) => doc.data())));
         return unsubscribe;
     });
+    useEffect(() => {
+        const unsubscribe = db
+        .collection("users")
+        .where("phoneNumber", "==", phoneNumber)
+        .onSnapshot((snapshot) => {
+            setPhotoURL(snapshot.docs.map((doc) => doc.data().photoURL))
+        });
+        return unsubscribe;
+    });
   return (
     <ListItem onPress={() => enterChat(id,chatName,phoneNumber)} key={id} bottomDivider>
-        <Avatar rounded source={{uri: chatMessages?.[0]?.photoURL || "https://www.seekpng.com/png/detail/110-1100707_person-avatar-placeholder.png"}} />
+        <Avatar rounded source={{uri: photoURL[0] || "https://www.seekpng.com/png/detail/110-1100707_person-avatar-placeholder.png"}} />
         <ListItem.Content>
             <ListItem.Title style={{fontWeight: "800"}}>
                 {chatName}
