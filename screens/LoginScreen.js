@@ -5,6 +5,7 @@ import PhoneInput from 'react-native-phone-input'
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { auth } from '../firebase'
 import { FirebaseRecaptchaVerifierModal, FirebaseRecaptchaBanner } from 'expo-firebase-recaptcha'
+import NetInfo from '@react-native-community/netinfo';
 
 const LoginScreen = ({navigation}) => {
   const [email,setEmail] = useState("");
@@ -15,7 +16,15 @@ const LoginScreen = ({navigation}) => {
     navigation.setOptions({
         headerBackVisible: false,
     }) 
-  }, [navigation])
+  }, [navigation]);
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener(state => {
+      if(!state.isConnected){
+        navigation.replace("NoConnection");
+      }
+    });
+    return unsubscribe;    
+  }, []);
   const signIn = () => {
     if(phoneNumber && phoneNumber.length > 12){
         navigation.navigate('OTP', {phoneNumber});

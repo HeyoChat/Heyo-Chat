@@ -6,6 +6,7 @@ import { Avatar, Image, Button, Icon } from 'react-native-elements'
 import { auth, db } from '../firebase';
 import {AntDesign, SimpleLineIcons} from "@expo/vector-icons";
 import AddChatScreen from './AddChatScreen'
+import NetInfo from '@react-native-community/netinfo';
 
 const HomeScreen = ({navigation}) => {
   const [chats, setChats] = useState([]);
@@ -15,6 +16,14 @@ const HomeScreen = ({navigation}) => {
       navigation.replace("Login");
     });
   };
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener(state => {
+      if(!state.isConnected){
+        navigation.replace("NoConnection");
+      }
+    });
+    return unsubscribe;    
+  }, []);
   useEffect(() => {
     const unsubscribe = db.collection("chats").where("whoIs", "array-contains-any", [auth.currentUser.phoneNumber]).onSnapshot(snapshot => {
       setChats(snapshot.docs.map(doc => ({
@@ -62,10 +71,11 @@ const HomeScreen = ({navigation}) => {
         ),
     }) 
   }, [navigation])
-  const enterChat = (id, chatName) => {
+  const enterChat = (id, chatName,phoneNumber) => {
     navigation.navigate("Chat", {
       id,
       chatName,
+      phoneNumber,
     });
   };
   const navigateToAdd = () => {
@@ -82,9 +92,7 @@ const HomeScreen = ({navigation}) => {
       </ScrollView>
       ):(
         <View style={styles.noChat}>
-        <Image style={styles.noChat} source={{
-            uri: "https://www.shareicon.net/download/2015/09/07/97135_face_512x512.png",
-        }} style={{width: 150, height: 150}} />
+        <Image style={styles.noChat} source={require('../assets/face.png')} style={{width: 150, height: 150}} />
         <Text> There is no chat started!</Text>
         </View>
       )

@@ -128,9 +128,7 @@ const AddChatScreen = ({navigation}) => {
           :
           (
             <View style={styles.noChat}>
-              <Image style={styles.noChat} source={{
-                  uri: "https://www.shareicon.net/download/2015/09/07/97135_face_512x512.png",
-              }} style={{width: 150, height: 150}} />
+              <Image style={styles.noChat} source={require('../assets/face.png')} style={{width: 150, height: 150}} />
               <Text>There is no one registered in your contacts!</Text>
               <ActivityIndicator style={{marginTop: 50,}} size="large" />
             </View>
