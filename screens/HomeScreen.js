@@ -11,11 +11,6 @@ import NetInfo from '@react-native-community/netinfo';
 const HomeScreen = ({navigation}) => {
   const [chats, setChats] = useState([]);
 
-  const signOut = () => {
-    auth.signOut().then(() => {
-      navigation.replace("Login");
-    });
-  };
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
       if(!state.isConnected){
@@ -43,13 +38,13 @@ const HomeScreen = ({navigation}) => {
   }, [])
   useLayoutEffect(() => {
     navigation.setOptions({
-        title: "Hey-O",
+        title: "Heyo",
         headerTitleAlign: 'center',
         headerStyle: {backgroundColor: "#fff"},
         headerTitleStyle: {color: "black"},
         headerTintColor: "black",
         headerLeft: ()=> (<View style={{marginLeft: 20}}>
-          <TouchableOpacity onPress={()=>{auth.signOut()}} activeOpacity={0.5}>
+          <TouchableOpacity onPress={()=>{navigation.navigate("UserSettings")}} activeOpacity={0.5}>
           <Avatar rounded source={{uri: auth?.currentUser?.photoURL }} />
           </TouchableOpacity>
         </View>
@@ -57,13 +52,11 @@ const HomeScreen = ({navigation}) => {
         headerRight: () => (
           <View style={{
             flexDirection: "row",
-            justifyContent: "space-between",
+            justifyContent: "flex-end",
             width: 80,
             marginRight: 20
           }} >
-            <TouchableOpacity>
-              <AntDesign name='camerao' size={24} color="black" />
-            </TouchableOpacity>
+            
             <TouchableOpacity>
               <SimpleLineIcons onPress={() => navigation.navigate("AddChat") } name='pencil' size={24} color="black" />
             </TouchableOpacity>

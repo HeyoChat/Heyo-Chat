@@ -1,7 +1,7 @@
- import { KeyboardAvoidingView, StyleSheet, TouchableOpacity, View, ActivityIndicator } from 'react-native'
+ import { KeyboardAvoidingView, StyleSheet, TouchableOpacity, View, ActivityIndicator, Linking } from 'react-native'
  import React, { useEffect, useLayoutEffect, useState } from 'react'
 import { StatusBar } from 'expo-status-bar'
-import { Avatar, Accessory, Button, Input, Text} from 'react-native-elements'
+import { Avatar, Accessory, Button, Input, Text, CheckBox} from 'react-native-elements'
 import {AntDesign, SimpleLineIcons} from "@expo/vector-icons";
 import * as ImagePicker from 'expo-image-picker';
 import { auth,db } from '../firebase';
@@ -14,7 +14,8 @@ import Spinner from 'react-native-loading-spinner-overlay';
    const [name, setName] = useState("");
    const [imageUrl, setImageUrl] = useState("https://www.seekpng.com/png/detail/110-1100707_person-avatar-placeholder.png");
    const [isLoading, setIsLoading] = useState(false);
-   
+   const [check, setCheck] = useState(false);
+
    useLayoutEffect(() => {
      navigation.setOptions({
          headerBackVisible: false,
@@ -54,20 +55,20 @@ import Spinner from 'react-native-loading-spinner-overlay';
 
    const register = () => {
      if(name.length<3){
-       alert("İsim en az 3 karakter olabilir");
+       alert("Name must be at least 3 characters");
      }else{
-        db.collection("users").add({
+       const userNow = auth.currentUser;
+       userNow.updateProfile({
+          phoneNumber: phoneNumber, 
+          displayName: name,
+          photoURL: imageUrl,
+       })
+        db.collection("users").doc(userNow.uid).set({
           phoneNumber: phoneNumber,
           displayName: name,
           photoURL: imageUrl
         });
-        const userNow = auth.currentUser;
-        userNow.updateProfile({
-          phoneNumber: phoneNumber, 
-          displayName: name,
-          photoURL: imageUrl,
-         })
-        navigation.navigate("Home")
+        navigation.replace("Home")
      }
    };
    
@@ -105,16 +106,29 @@ import Spinner from 'react-native-loading-spinner-overlay';
      (
       <KeyboardAvoidingView behavior='padding' style={styles.contaner}>
        <StatusBar style='light' />
-       <Text h3 style={{marginBottom: 50,}}>Create a Hey-O Account</Text>
+       <Text h3 style={{marginBottom: 50,}}>Create a Heyo Account</Text>
        <View style={styles.inputContainer }> 
              <TouchableOpacity onPress={openImagePickerAsync}>
               <Avatar size="xlarge" rounded source={{uri: imageUrl}}>
                 <Avatar.Accessory size={24}/>
               </Avatar>
             </TouchableOpacity>
-            <Input placeholder='Full Name' style={{textAlign:'center'}} autoFocus type="text" onChangeText={(text)=>{setName(text)}} value={(name)} />            
+            <Input placeholder='Display Name' style={{textAlign:'center'}} autoFocus type="text" onChangeText={(text)=>{setName(text)}} value={(name)} />
+            <CheckBox
+              center
+              title={<Text>I have read and aggree the <Text style={{color: 'blue'}} onPress={() => Linking.openURL('https://heyochat.github.io/PublicWeb/privacypolicy.html')}>Privacy Policy</Text> and <Text style={{color: 'blue'}} onPress={() => Linking.openURL('https://heyochat.github.io/PublicWeb/termofuse.html')}>Terms of Use</Text></Text>}
+              checked={check}
+              onPress={() => setCheck(!check)}
+            />        
        </View>
-       <Button style={styles.button} raised onPress={register} title="Finish" />
+        {
+          check && name.length >= 3 ? (
+            <Button style={styles.button} raised onPress={register} title="Finish" />
+          ) : (
+            <Button disabled style={styles.button} raised onPress={register} title="Finish" />
+          )
+        }
+       
        <View style={{height:100}} />
      </KeyboardAvoidingView>
      )

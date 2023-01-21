@@ -5,12 +5,12 @@ import { Button, Input } from 'react-native-elements';
 import CustomText from '../compoments/CustomText';
 import CustomTextInput from '../compoments/CustomTextInput';
 import FullButtonComponent from '../compoments/FullButtonCompoment';
-import { getAuth, PhoneAuthProvider, signInWithCredential } from 'firebase/auth';
+import { deleteUser, getAuth, PhoneAuthProvider, signInWithCredential } from 'firebase/auth';
 import { initializeApp, getApp } from 'firebase/app';
 import { auth,db } from '../firebase';
 
 
-const OTPScreen = function ({ route: { params: { phoneNumber } }, navigation }) {
+const OTPScreen = function ({ route: { params: { phoneNumber, operation } }, navigation }) {
   const [otpArray, setOtpArray] = React.useState(['', '', '', '']);
   const [submittingOtp, setSubmittingOtp] = React.useState(true);
   const [errorMessage, setErrorMessage] = React.useState('');
@@ -77,14 +77,22 @@ const OTPScreen = function ({ route: { params: { phoneNumber } }, navigation }) 
      }
    }
    const updateLogin = (querySnapshot) => {
-    const data = querySnapshot.docs.map((doc) => doc.data());
+    const data = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     const userNow = auth.currentUser;
     userNow.updateProfile({
       phoneNumber: phoneNumber, 
       displayName: data[0].displayName,
-      photoURL: data[0].photoURL
+      photoURL: data[0].photoURL,
     });
-    navigation.navigate("Home");
+    if(operation == "Deletion"){
+      db.collection('users').doc(auth.currentUser.uid).set({"displayName": "Deleted User", "phoneNumber": "NOT REGISTERED", "photoURL": ""})
+      deleteUser(auth.currentUser).then(()=>{
+        navigation.replace("Login")
+      })
+    }else{
+      navigation.navigate("Home");
+    }
+    
    }
   const onOtpChange = index => {
     return value => {

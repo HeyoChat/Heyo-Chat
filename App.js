@@ -10,6 +10,7 @@ import ChatScreen from './screens/ChatScreen';
 import OTPScreen from './screens/OTPScreen';
 import LoadingScreen from './screens/LoadingScreen';
 import NoConnection from './screens/NoConnection';
+import UserSettings from './screens/UserSettings';
 
 const Stack = createNativeStackNavigator();
 const globalScreenOptions = {
@@ -28,6 +29,7 @@ export default function App() {
         <Stack.Screen name='OTP' component={OTPScreen} />
         <Stack.Screen name='Register' component={RegisterScreen} />
         <Stack.Screen name='Home' component={HomeScreen} />
+        <Stack.Screen name='UserSettings' component={UserSettings} />
         <Stack.Screen name='AddChat' component={AddChatScreen} />
         <Stack.Screen name='Chat' component={ChatScreen} />
       </Stack.Navigator>

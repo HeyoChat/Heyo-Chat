@@ -95,9 +95,11 @@ const AddChatScreen = ({navigation}) => {
           navigation.navigate("Chat", {
             id,
             chatName,
+            phoneNumber
           });  
         }
       });
+      console.log(isHave)
       if(!isHave){
         await db.collection("users").where("phoneNumber", "==", phoneNumber)
         .get()
