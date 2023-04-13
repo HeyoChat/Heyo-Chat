@@ -19,7 +19,7 @@ const AddChatScreen = ({navigation}) => {
             const { data } = await Contacts.getContactsAsync({
               fields: [Contacts.Fields.PhoneNumbers],
             });
-    
+            console.log(data)
             if (data.length > 0) {
               for(var i = 0; i<data.length; i++){
                 if (Platform.OS == "ios"){
@@ -33,14 +33,10 @@ const AddChatScreen = ({navigation}) => {
                     }
                   }
                 }else if(Platform.OS == "android"){
-                  const number = data[i].phoneNumbers && data[i].phoneNumbers[1] && data[i].phoneNumbers[1].number && data[i].phoneNumbers[0] && data[i].phoneNumbersgit[0].number
-                  
+                  const number = data[i].phoneNumbers[0]["number"]
+                  console.log(number)
                   number != undefined ? mergedPhone[i] = number : mergedPhone[i] = "";
-                  mergedPhone[i] = mergedPhone[i].replace(/ /g, '');
-                  if(mergedPhone[i].startsWith("0")){
-                    mergedPhone[i] = "+9"+mergedPhone[i]
-                  }
-                  console.log(mergedPhone[i])
+                  mergedPhone[i] = mergedPhone[i].toString().replace(/[^\d+]/g, '');
                 }
                 
               }
@@ -48,17 +44,23 @@ const AddChatScreen = ({navigation}) => {
                   if(Platform.OS == "ios"){
                     mergedPhone[i] = countrCodes[i]+contactPhones[i];
                   }
-                  db.collection("users").where("phoneNumber", "==", mergedPhone[i])
+                  console.log(mergedPhone[i])
+                  db.collection("users")
+                  .where('phoneNumber', '==', mergedPhone[i])
+                  .limit(1)
                   .get()
                   .then(querySnapshot => {  
                     if(querySnapshot.empty){
+                      console.log("no record found")
                     }else{
                       const result = querySnapshot.docs.map(doc => ({
                         id: doc.id,
                         data: doc.data(),
                       }));
                       if (result[0].data.phoneNumber != auth.currentUser.phoneNumber){
-                          setContacts(old => [...old, result[0]]);
+                          if(!contacts.includes(result[0].data.phoneNumber)){
+                            setContacts(old => [...old, result[0]]);
+                          }
                       }
                     }                    
                   })
