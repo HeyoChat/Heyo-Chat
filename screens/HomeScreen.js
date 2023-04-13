@@ -80,7 +80,7 @@ const HomeScreen = ({navigation}) => {
       (
       <ScrollView style={styles.container}>
         {chats.map(({id, data: {chatName1,chatName2,whoIs}})=>(
-          <CustomListItem key={id} id={id} chatName={whoIs[0]==auth.currentUser.phoneNumber?chatName2:chatName1} phoneNumber={whoIs[0]==auth.currentUser.phoneNumber?whoIs[1]:whoIs[0]} enterChat={enterChat} />
+          <CustomListItem key={id} id={id} isListed={true} chatName={whoIs[0]==auth.currentUser.phoneNumber?chatName2:chatName1} phoneNumber={whoIs[0]==auth.currentUser.phoneNumber?whoIs[1]:whoIs[0]} enterChat={enterChat} />
         ))}
       </ScrollView>
       ):(

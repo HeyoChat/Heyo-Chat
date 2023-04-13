@@ -5,11 +5,13 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { async } from '@firebase/util';
 import * as ImagePicker from 'expo-image-picker';
 import uuid from "uuid";
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import {AntDesign, SimpleLineIcons} from "@expo/vector-icons";
-import { Avatar, Button } from 'react-native-elements';
+import { TouchableOpacity } from 'react-native';
+import {AntDesign, SimpleLineIcons, FontAwesome} from "@expo/vector-icons";
+import { Avatar, Button, ListItem } from 'react-native-elements';
 import { deleteUser } from 'firebase/auth';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import TouchableScale from 'react-native-touchable-scale';
+import LinearGradient from 'expo-linear-gradient';
 
 const UserSettings = ({navigation}) => {
     const [imageUrl, setImageUrl] = useState(auth?.currentUser?.photoURL)
@@ -20,7 +22,7 @@ const UserSettings = ({navigation}) => {
             navigation.replace("Login");
         });
     };
-    let openImagePickerAsync = async () => {
+    async function openImagePickerAsync(){
         let permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
     
         if (permissionResult.granted === false) {
@@ -88,15 +90,26 @@ const UserSettings = ({navigation}) => {
     useLayoutEffect(() => {
       navigation.setOptions({
           headerBackTitle: "Chats",
-          title: "User Settings",
+          headerTitleVisible: false,
+          headerTintColor: '#000',
+          headerStyle: {
+            headerTransparent: true,
+          },
+          headerShadowVisible: false,
+          headerRight: () => (
+            <View style={{flexDirection: "row", justifyContent: "flex-end", width: 80, marginRight: 10,}}>
+                <TouchableOpacity onPress={()=>{}}>
+                    <SimpleLineIcons name='settings' size={24} color="black" />
+                </TouchableOpacity>
+            </View>
+        ),
       })
-    }, [navigation]);    
+    }, [navigation]); 
     return (
       <View style={styles.container}>
         <View style={styles.container}>
-        <SimpleLineIcons onPress={() => signOut() } name='logout' size={24} color="black" />
           <View style={styles.avatarContainer}> 
-          <TouchableOpacity onPress={openImagePickerAsync}>
+            <TouchableOpacity onPress={openImagePickerAsync}>
               <Avatar size="xlarge" rounded source={{uri: imageUrl}}>
                 <Avatar.Accessory size={24}/>
               </Avatar>
@@ -105,23 +118,76 @@ const UserSettings = ({navigation}) => {
                 {auth?.currentUser?.displayName}
             </Text>
             <Text style={styles.infoValue}>{auth?.currentUser?.phoneNumber}</Text>
-            <Button
-              title="Delete Your Account"
-              buttonStyle={{ backgroundColor: 'rgba(214, 61, 57, 1)' }}
-              containerStyle={{
-                height: 40,
-                marginHorizontal: 50,
-                marginVertical: 10,
-              }}
-              onPress={deleteAccount}
-              titleStyle={{ color: 'white', marginHorizontal: 20 }}
-            />
           </View>
-          
+          <ListItem 
+            key={1}
+            Component={TouchableScale}
+            friction={90} //
+            tension={100} // These props are passed to the parent component (here TouchableScale)
+            activeScale={0.95} //
+            titleStyle={{ color: 'black', fontWeight: 'bold' }}
+            chevron={{ color: 'black' }}
+            style={{elevation: 5}}
+            onPress={signOut}
+            bottomDivider
+            >
+            <SimpleLineIcons name="logout" size={24} color="blue" />
+            <ListItem.Content>
+              <ListItem.Title>Sing out</ListItem.Title>
+            </ListItem.Content>
+          </ListItem>
+          <ListItem 
+            key={2}
+            Component={TouchableScale}
+            friction={90} //
+            tension={100} // These props are passed to the parent component (here TouchableScale)
+            activeScale={0.95} //
+            titleStyle={{ color: 'black', fontWeight: 'bold' }}
+            chevron={{ color: 'black' }}
+            style={{elevation: 5}}
+            onPress={deleteAccount}
+            bottomDivider
+            >
+            <SimpleLineIcons name="trash" size={24} color="blue" />
+            <ListItem.Content>
+              <ListItem.Title>Delete your account</ListItem.Title>
+            </ListItem.Content>
+          </ListItem>
+          <ListItem 
+            key={3}
+            Component={TouchableScale}
+            friction={90} //
+            tension={100} // These props are passed to the parent component (here TouchableScale)
+            activeScale={0.95} //
+            titleStyle={{ color: 'black', fontWeight: 'bold' }}
+            chevron={{ color: 'black' }}
+            style={{elevation: 5}}
+            onPress={() => Linking.openURL('https://heyochat.github.io/PublicWeb/privacypolicy.html')}
+            bottomDivider
+            >
+            <SimpleLineIcons name="lock" size={24} color="blue" />
+            <ListItem.Content>
+              <ListItem.Title>Privacy policy</ListItem.Title>
+            </ListItem.Content>
+          </ListItem>
+          <ListItem 
+            key={4}
+            Component={TouchableScale}
+            friction={90} //
+            tension={100} // These props are passed to the parent component (here TouchableScale)
+            activeScale={0.95} //
+            titleStyle={{ color: 'black', fontWeight: 'bold' }}
+            chevron={{ color: 'black' }}
+            style={{elevation: 5}}
+            onPress={() => Linking.openURL('https://heyochat.github.io/PublicWeb/termofuse.html')}
+            bottomDivider
+            >
+            <SimpleLineIcons name="check" size={24} color="blue" />
+            <ListItem.Content>
+              <ListItem.Title>Terms of use</ListItem.Title>
+            </ListItem.Content>
+          </ListItem>
         </View>
-        <SafeAreaView style={styles.footer}>
-          <Text> <Text style={{color: 'blue'}} onPress={() => Linking.openURL('https://heyochat.github.io/PublicWeb/privacypolicy.html')}>Privacy Policy</Text> & <Text style={{color: 'blue'}} onPress={() => Linking.openURL('https://heyochat.github.io/PublicWeb/termofuse.html')}>Terms of Use</Text></Text>
-        </SafeAreaView>
       </View>
       );
 }
