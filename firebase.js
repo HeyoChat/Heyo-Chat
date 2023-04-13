@@ -19,6 +19,7 @@ const firebaseConfig = {
 let app;
 if (firebase.apps.length === 0){
     app = firebase.initializeApp(firebaseConfig);
+    firebase.firestore().settings({ experimentalForceLongPolling: true, merge: true });
     initializeAuth(app, {
       persistence: getReactNativePersistence(AsyncStorage)
     });
