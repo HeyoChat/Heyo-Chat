@@ -243,6 +243,10 @@ const ChatScreen = ({navigation, route}) => {
         setReplyId(null);
     }
 
+    const openCamera = () => {
+        navigation.navigate("Camera", {id: route.params.id, chatName: route.params.chatName})
+    }
+
     return (
         <SafeAreaView style={{flex:1, backgroundColor: "white"}}>
             <StatusBar style='light'/>
@@ -304,6 +308,7 @@ const ChatScreen = ({navigation, route}) => {
                                     chatName={route.params.chatName}
                                     isLeft={false}
                                     text={data.message}
+                                    msgPhoto={data.photo}
                                     photo={auth.currentUser.photoURL}
                                     timeStamp={data.timestamp}
                                     deleted={data.deleted}
@@ -322,12 +327,13 @@ const ChatScreen = ({navigation, route}) => {
                                     chatName={route.params.chatName}
                                     isLeft={true}
                                     text={data.message}
+                                    msgPhoto={data.photo}
                                     photo={photoURL}
                                     timeStamp={data.timestamp}
                                     deleted={data.deleted}
                                     reply={data.reply}
                                     onSwipe={onSwipe}
-                                    onHold={showActionSheetReciever}
+                                    onHold={showActionSheetSender}
                                     isNew={arrayObj[index+1]?.data.phoneNumber != data.phoneNumber }
                                 ></Message>
                             )
@@ -349,8 +355,13 @@ const ChatScreen = ({navigation, route}) => {
                     )}
                     
                     <View style={styles.footer}>
+                        <View style={styles.textInput}>
+                            <TextInput multiline={true} style={{width: "80%"}} placeholder='Type a massage ...' value={input} onChangeText={(text)=>setInput(text)} />
+                            <TouchableOpacity onPress={openCamera} activeOpacity={0.5}>
+                                <Ionicons name='camera' size={24} color="grey" />
+                            </TouchableOpacity>
+                        </View>
                         
-                        <TextInput placeholder='Type a massage ...' style={styles.textInput} value={input} onChangeText={(text)=>setInput(text)} />
                         <TouchableOpacity style={{backgroundColor: "#2B6BE6", padding: 7.5, borderRadius: 30}} onPress={sendMessage} activeOpacity={0.5}>
                             <Ionicons name='send' size={24} color="white" />
                         </TouchableOpacity>
@@ -371,12 +382,15 @@ const styles = StyleSheet.create({
     footer: {
         flexDirection: "row",
         alignItems: "center",
+        justifyContent: "center",
         width: "100%",
         padding: 15,
     },
     textInput: {
+        flexDirection: "row",
+        justifyContent: "space-between",
         bottom: 0,
-        height: 40,
+        height: "auto",
         flex: 1,
         marginRight: 15, 
         backgroundColor: "#ECECEC",

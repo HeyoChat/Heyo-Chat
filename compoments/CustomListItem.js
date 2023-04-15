@@ -3,6 +3,7 @@ import { ListItem, Avatar, Image, } from 'react-native-elements'
 import React, { useEffect, useState } from 'react'
 import { ListItemContent } from '@rneui/base/dist/ListItem/ListItem.Content'
 import { db, auth } from '../firebase'
+import { Foundation } from '@expo/vector-icons'; 
 
 const CustomListItem = ({id,chatName,phoneNumber,enterChat,isListed}) => {
     const [chatMessages, setChatMessages] = useState([]);
@@ -49,7 +50,9 @@ const CustomListItem = ({id,chatName,phoneNumber,enterChat,isListed}) => {
                         <Image style={{width: 20, height: 20}} source={{uri: "https://firebasestorage.googleapis.com/v0/b/chat-app-uey.appspot.com/o/hi-hand.gif?alt=media&token=ea2c7eb2-592c-4b59-a5b0-217c8f8fd1a4"}} ></Image>
                         <Text> Say hi to {chatName}</Text>
                     </View>
-                ) :chatMessages?.[0]?.message }
+                ) : chatMessages?.[0]?.photo ? (
+                    <Foundation name="photo" size={24} style={{width: 20, height: 20}} color="grey" />
+                ) : chatMessages?.[0]?.message }
                 
             </ListItem.Subtitle>
         </ListItem.Content>

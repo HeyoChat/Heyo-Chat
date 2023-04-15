@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View, Modal } from 'react-native'
 import React, { useEffect, useLayoutEffect, useState } from 'react'
 import {
 	FlingGestureHandler,
@@ -14,12 +14,14 @@ import Animated, {
 	useSharedValue,
     runOnJS
 } from "react-native-reanimated";
-import { Avatar } from 'react-native-elements';
+import { Avatar, Image } from 'react-native-elements';
 import Moment from 'moment';
 import { auth, db } from '../firebase';
+import {Entypo} from "@expo/vector-icons";
 
-const Message = ({id,routeId,chatName,text,timeStamp,photo,isLeft,deleted,reply,onSwipe,onHold,isNew}) => {
+const Message = ({id,routeId,chatName,text,msgPhoto,timeStamp,photo,isLeft,deleted,reply,onSwipe,onHold,isNew}) => {
     const [replyDoc, setReplyDoc] = useState(null);
+    const [modalVisible, setModalVisible] = useState(false);
     const startingPosition = 0;
 	const x = useSharedValue(startingPosition);
     const eventHandler = useAnimatedGestureHandler({
@@ -83,24 +85,26 @@ const Message = ({id,routeId,chatName,text,timeStamp,photo,isLeft,deleted,reply,
                     }}
                     />
                 )}
-            {!deleted ? (
-            <>
-                <Text style={isLeft ? styles.senderText : styles.recieverText}>{text}</Text>
-                <Text style={styles.timeStamp}>{Moment(timeStamp?.toDate()).format('H:m')}</Text>
-                </>
-            ): (
-                <Text style={styles.recieverDeletedText}>This message deleted!</Text>
-            )}
-            {replyDoc && (
-                <TouchableOpacity>
-                    <View style={styles.replyContainer}>
-                        <Text style={styles.title}>
-                            {replyDoc.phoneNumber == auth.currentUser.phoneNumber ? "Me" : chatName}
-                        </Text>
-                        <Text style={styles.reply}>{replyDoc.deleted ? "This message was deleted!" : replyDoc.message}</Text>
-                    </View>
-                </TouchableOpacity>
-            )}
+            {msgPhoto ? (
+                <Image style={{width: 200, height: 200, borderRadius: 15}} source={{uri: msgPhoto}} />
+            ) : !deleted ? (
+                <>
+                    <Text style={isLeft ? styles.senderText : styles.recieverText}>{text}</Text>
+                    <Text style={styles.timeStamp}>{Moment(timeStamp?.toDate()).format('H:m')}</Text>
+                    </>
+                ): (
+                    <Text style={styles.recieverDeletedText}>This message deleted!</Text>
+                )}
+                {replyDoc && (
+                    <TouchableOpacity>
+                        <View style={styles.replyContainer}>
+                            <Text style={styles.title}>
+                                {replyDoc.phoneNumber == auth.currentUser.phoneNumber ? "Me" : chatName}
+                            </Text>
+                            <Text style={styles.reply}>{replyDoc.deleted ? "This message was deleted!" : replyDoc.message}</Text>
+                        </View>
+                    </TouchableOpacity>
+                )}
             </View>
             </TouchableOpacity>
         </Animated.View>
